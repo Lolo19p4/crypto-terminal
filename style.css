@@ -1,0 +1,19 @@
+*{box-sizing:border-box}body{margin:0;background:#07090c;color:#d8dee9;font:20px/1.4 "DejaVu Sans Mono",Consolas,monospace;padding:12px}
+h2{font-size:18px;color:#c792ea;margin:0 0 8px;letter-spacing:2px}
+.green{color:#39ff88}.red{color:#ff4d5e}.yellow{color:#ffd84d}.blue{color:#4dc3ff}.violet{color:#c792ea}
+.top{display:flex;gap:28px;align-items:center;flex-wrap:wrap;border:1px solid #1f2a36;padding:10px 14px;background:#0d1117}
+.logo{font-weight:bold;color:#39ff88;font-size:24px}.tag{font-size:14px;color:#07090c;background:#ffd84d;padding:2px 6px;margin-left:8px}
+.stat b{font-size:24px;margin-left:6px}
+main{display:grid;grid-template-columns:330px 1fr;gap:12px;margin-top:12px}
+.agents,.center,.card{border:1px solid #1f2a36;background:#0d1117;padding:12px}
+.agents ul{list-style:none;padding:0;margin:0}.agents li{padding:8px 0;border-bottom:1px dashed #1f2a36}
+.agents li span{display:block;font-size:16px;color:#8b98a8}.agents li.on b{text-shadow:0 0 8px currentColor}
+.pipeline{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.pipeline div{padding:6px 10px;border:1px solid #1f2a36;color:#8b98a8}.pipeline div.on{border-color:#39ff88;color:#39ff88;background:#0f2a1b}
+.feed{height:210px;overflow:hidden;font-size:18px}.feed div{white-space:nowrap}
+.row2{display:grid;grid-template-columns:1fr 1.4fr;gap:12px;margin-top:10px}canvas{width:100%;height:200px}
+#tradebody{font-size:22px}
+footer{display:grid;grid-template-columns:330px 1fr;gap:12px;margin-top:12px}
+.results div{margin:6px 0}.results b{font-size:26px}
+table{width:100%;border-collapse:collapse;font-size:18px}th{text-align:left;color:#4dc3ff}td{padding:3px 6px;border-top:1px solid #151d26}
+.note{color:#ffd84d;font-size:16px;text-align:center}

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="fr"><head><meta charset="utf-8"><title>Grok Bot Terminal — DÉMO</title>
+<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="top">
+ <div class="logo">▣ GROK BOT TERMINAL <span class="tag">MODE PAPER · ARGENT FICTIF</span></div>
+ <div class="stat">données <b id="api" class="yellow">connexion…</b></div>
+ <div class="stat">en marche <b id="timer">00:00:00</b></div>
+ <div class="stat">solde <b id="bal" class="green">$0</b></div>
+ <div class="stat">trades <b id="cnt">0</b></div>
+ <div class="stat">gagnants <b id="wins" class="green">0</b> / perdants <b id="losses" class="red">0</b></div>
+</header>
+<main>
+ <aside class="agents"><h2>AGENTS</h2><ul id="agents"></ul></aside>
+ <section class="center">
+  <h2>FLUX EN DIRECT</h2>
+  <div class="pipeline" id="pipe"></div>
+  <div class="feed" id="feed"></div>
+  <div class="row2">
+   <div class="card" id="trade"><h2>TRADE EN COURS</h2><div id="tradebody">—</div></div>
+   <div class="card"><h2>COURBE DU SOLDE</h2><canvas id="eq" width="600" height="200"></canvas></div>
+  </div>
+ </section>
+</main>
+<footer>
+ <div class="card results"><h2>RÉSULTATS</h2><div>Départ <b id="start" class="blue"></b></div><div>Maintenant <b id="now" class="green"></b></div><div>Variation <b id="pct"></b></div></div>
+ <div class="card journal"><h2>JOURNAL DES TRADES</h2><table><thead><tr><th>Heure</th><th>Type</th><th>Token</th><th>Détail</th></tr></thead><tbody id="jr"></tbody></table></div>
+</footer>
+<p class="note">⚠ Simulation uniquement : argent fictif. Prix réels lus sur DexScreener (lecture seule). Aucun portefeuille, aucune clé, aucun vrai achat.</p>
+<script src="app.js"></script></body></html>
