@@ -20,6 +20,9 @@ $("jeton").innerHTML=JETONS.map((j,i)=>`<option value="${i}">${j[0]}</option>`).
 function majSens(){$("btnAchat").classList.toggle("on",sens==="achat");$("btnVente").classList.toggle("on",sens==="vente");
  $("lblMontant").textContent=sens==="achat"?"Je paie (USDC)":"Je vends (quantité de "+JETONS[$("jeton").value][0]+")";devis=null;$("devis").textContent="";}
 $("btnAchat").onclick=()=>{sens="achat";majSens()};$("btnVente").onclick=()=>{sens="vente";majSens()};$("jeton").onchange=majSens;majSens();
+window.ajouterJeton=function(sym,mint,dec){let i=JETONS.findIndex(j=>j[1]===mint);
+ if(i<0){JETONS.push([sym,mint,dec]);i=JETONS.length-1;$("jeton").insertAdjacentHTML("beforeend",`<option value="${i}">${sym}</option>`)}
+ $("jeton").value=i;sens="achat";majSens();if(!$("montant").value)$("montant").value="10";$("swap").scrollIntoView({behavior:"smooth"});msg("Vérifiez le prix puis échangez. Token risqué !",true)};
 function msg(t,err){$("swapMsg").textContent=t;$("swapMsg").className=err?"err":""}
 function provider(){return window.phantom&&window.phantom.solana&&window.phantom.solana.isPhantom?window.phantom.solana:null}
 $("connect").onclick=async()=>{const p=provider();

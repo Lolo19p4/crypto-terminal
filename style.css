@@ -20,3 +20,10 @@ input{width:100%;font-size:24px;padding:12px;background:#111;color:#3f6;border:2
 #swapbox button{font-size:26px;padding:14px;border-radius:10px;border:2px solid #3f6;font-family:monospace;font-weight:bold}
 .sens{display:flex;gap:8px}.sens button{flex:1;background:#111;color:#3f6}.sens button.on{background:#3f6;color:#000}
 .gris{background:#222;color:#fff}.vert{background:#3f6;color:#000}#devis{font-size:24px;color:#fff}#swapMsg{font-size:22px;color:#3f6}#swapMsg.err{color:#f55}#swapMsg a{color:#ff0}
+
+#memes .alerte{background:#3a1d1d;border:2px solid #f85149;border-radius:10px;padding:12px;font-size:1.05em;line-height:1.4}
+.meme{display:flex;align-items:center;gap:10px;background:#141a22;border-radius:12px;padding:12px;margin:8px 0;font-size:1.05em;flex-wrap:wrap}
+.meme img{width:40px;height:40px;border-radius:50%}.meme .nm{flex:1;min-width:120px}.meme .nm b{font-size:1.2em}
+.meme .st{font-size:.9em;color:#9aa7b4;width:100%}.meme .up{color:#3fb950}.meme .dn{color:#f85149}
+.meme button{background:#3fb950;color:#000;font-weight:700;font-size:1.1em;border:0;border-radius:10px;padding:12px 18px}
+#memes .sens button{font-size:1.15em;padding:12px;flex:1}#memes .sens{display:flex;gap:8px}#memes .sens button.on{background:#3fb950;color:#000}
