@@ -1,19 +1,54 @@
-// ===== Réglages des frais (Programme de parrainage Jupiter) =====
-// Compte de parrainage Jupiter appartenant à Loïc (portefeuille BSxnWLQadUHMW3uS1uiG7EbEdLbdfdX72Wq4RJ7bd13q).
-// À remplir après sa création sur https://referral.jup.ag (signée par Loïc dans son Phantom).
-const REFERRAL_ACCOUNT = "";
-const REFERRAL_FEE_BPS = 255; // maximum autorisé par Jupiter (50 à 255 points de base = 2,55 %)
-const SOL = "So11111111111111111111111111111111111111112";
+// ===== Échange Jupiter (Swap API v2 /build) avec frais du site =====
+// Les frais vont sur le compte USDC de Loïc (propriétaire BSxnWLQadUHMW3uS1uiG7EbEdLbdfdX72Wq4RJ7bd13q).
+const FEE_ACCOUNT = "FdmsMDUwUQ5fcouLXKrwuc8gLuMLYVm5qxtuYHa7bmeg";
+const FEE_BPS = 255; // 2,55 %
 const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const JETONS = [
+  ["SOL","So11111111111111111111111111111111111111112",9],
+  ["JUP","JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",6],
+  ["BONK","DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",5],
+  ["WIF","EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",6],
+  ["TRUMP","6p6xgHyF7AeE6TZkSmFsko444wqoP15icUSqi2jfGiPN",6],
+  ["RAY","4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",6],
+  ["USDT","Es9vMFrzaCERmJfrF4H2FYD4KCoNkY5ywGQhD8vgNqG",6]];
+const API = "https://api.jup.ag/swap/v2/build";
 (function(){
-  const actif = REFERRAL_ACCOUNT.length > 30;
-  document.getElementById("frais").textContent = actif
-    ? "Frais du site : " + (REFERRAL_FEE_BPS/100).toLocaleString("fr-FR") + " % par échange (en plus des frais réseau Solana)"
-    : "Frais du site : 0 % — seuls les frais Jupiter et réseau s'appliquent";
-  const formProps = { initialInputMint: SOL, initialOutputMint: USDC };
-  if (actif) { formProps.referralAccount = REFERRAL_ACCOUNT; formProps.referralFee = REFERRAL_FEE_BPS; }
-  function go(){ if(!window.Jupiter) return setTimeout(go,300);
-    window.Jupiter.init({ displayMode:"integrated", integratedTargetId:"jupiter", formProps,
-      branding:{ name:"Terminal Crypto" }, containerStyles:{ width:"100%", height:"560px" } }); }
-  go();
+const $=id=>document.getElementById(id);
+let wallet=null, sens="achat", devis=null;
+$("frais").textContent="Frais du site : "+(FEE_BPS/100).toLocaleString("fr-FR")+" % par échange (payés en USDC), + frais réseau Solana";
+$("jeton").innerHTML=JETONS.map((j,i)=>`<option value="${i}">${j[0]}</option>`).join("");
+function majSens(){$("btnAchat").classList.toggle("on",sens==="achat");$("btnVente").classList.toggle("on",sens==="vente");
+ $("lblMontant").textContent=sens==="achat"?"Je paie (USDC)":"Je vends (quantité de "+JETONS[$("jeton").value][0]+")";devis=null;$("devis").textContent="";}
+$("btnAchat").onclick=()=>{sens="achat";majSens()};$("btnVente").onclick=()=>{sens="vente";majSens()};$("jeton").onchange=majSens;majSens();
+function msg(t,err){$("swapMsg").textContent=t;$("swapMsg").className=err?"err":""}
+function provider(){return window.phantom&&window.phantom.solana&&window.phantom.solana.isPhantom?window.phantom.solana:null}
+$("connect").onclick=async()=>{const p=provider();
+ if(!p){location.href="https://phantom.app/ul/browse/"+encodeURIComponent(location.href)+"?ref="+encodeURIComponent(location.origin);return}
+ try{const r=await p.connect();wallet=r.publicKey.toString();$("connect").textContent="Phantom connecté : "+wallet.slice(0,4)+"…"+wallet.slice(-4);msg("")}catch(e){msg("Connexion refusée",true)}};
+function params(){const j=JETONS[$("jeton").value],n=parseFloat(String($("montant").value).replace(",","."));
+ if(!(n>0))throw new Error("Entrez un montant");
+ const inMint=sens==="achat"?USDC:j[1],outMint=sens==="achat"?j[1]:USDC,dec=sens==="achat"?6:j[2];
+ return {j,inMint,outMint,amount:BigInt(Math.round(n*10**dec)).toString()}}
+async function build(taker){const p=params();
+ const q=new URLSearchParams({inputMint:p.inMint,outputMint:p.outMint,amount:p.amount,taker,slippageBps:"100",platformFeeBps:String(FEE_BPS),feeAccount:FEE_ACCOUNT});
+ const r=await fetch(API+"?"+q);if(r.status===429)throw new Error("Jupiter est saturé, réessayez dans 1 minute");
+ const d=await r.json();if(!r.ok||d.error)throw new Error(d.error||("Erreur Jupiter "+r.status));return {p,d}}
+$("devisBtn").onclick=async()=>{try{msg("Calcul du prix…");
+ const {p,d}=await build(wallet||"9yj3zvLS3fDMqi1F8zhkaWfq8TZpZWHe6cz1Sgt7djXf");
+ const outDec=sens==="achat"?p.j[2]:6,inDec=sens==="achat"?6:p.j[2];
+ const recu=Number(d.outAmount)/10**outDec,donne=Number(d.inAmount)/10**inDec;
+ const usdc=sens==="achat"?donne:recu/(1-FEE_BPS/1e4),fee=usdc*FEE_BPS/1e4;
+ $("devis").innerHTML=`Vous recevez ≈ <b>${recu.toLocaleString("fr-FR",{maximumFractionDigits:6})} ${sens==="achat"?p.j[0]:"USDC"}</b><br>Frais du site : ${fee.toLocaleString("fr-FR",{maximumFractionDigits:4})} USDC`;msg("")}catch(e){msg("⚠ "+e.message,true)}};
+$("echanger").onclick=async()=>{try{
+ if(!wallet){msg("Connectez d'abord Phantom",true);return}
+ msg("Préparation…");const {d}=await build(wallet);const W=window.solanaWeb3;
+ const ix=x=>new W.TransactionInstruction({programId:new W.PublicKey(x.programId),keys:x.accounts.map(a=>({pubkey:new W.PublicKey(a.pubkey),isSigner:a.isSigner,isWritable:a.isWritable})),data:Uint8Array.from(atob(x.data),c=>c.charCodeAt(0))});
+ const list=[W.ComputeBudgetProgram.setComputeUnitLimit({units:600000}),...d.computeBudgetInstructions.map(ix),...d.setupInstructions.map(ix),ix(d.swapInstruction),...(d.cleanupInstruction?[ix(d.cleanupInstruction)]:[]),...(d.otherInstructions||[]).map(ix)];
+ const alts=Object.entries(d.addressesByLookupTableAddress||{}).map(([k,v])=>new W.AddressLookupTableAccount({key:new W.PublicKey(k),state:{deactivationSlot:BigInt("18446744073709551615"),lastExtendedSlot:0,lastExtendedSlotStartIndex:0,addresses:v.map(a=>new W.PublicKey(a))}}));
+ const hash=new W.PublicKey(Uint8Array.from(d.blockhashWithMetadata.blockhash)).toBase58();
+ const m=new W.TransactionMessage({payerKey:new W.PublicKey(wallet),recentBlockhash:hash,instructions:list}).compileToV0Message(alts);
+ const tx=new W.VersionedTransaction(m);msg("Validez dans Phantom…");
+ const r=await provider().signAndSendTransaction(tx);
+ $("swapMsg").innerHTML=`✅ Échange envoyé ! <a href="https://solscan.io/tx/${r.signature}" target="_blank">Voir sur Solscan</a>`;$("swapMsg").className="";
+}catch(e){msg("⚠ "+(e.message||"Échange annulé"),true)}};
 })();

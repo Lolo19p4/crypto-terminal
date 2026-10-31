@@ -2,7 +2,7 @@
 <html lang="fr"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Terminal Crypto de Loïc</title>
-<link rel="stylesheet" href="style.css?v=3"></head>
+<link rel="stylesheet" href="style.css?v=4"></head>
 <body>
 <header><h1>&gt; TERMINAL CRYPTO</h1><div id="etat">Chargement…</div></header>
 <form id="form" class="cherche"><input id="recherche" type="search" placeholder="Chercher (ex: sol)" autocomplete="off" enterkeyhint="search"><button type="submit">Rechercher</button></form>
@@ -11,12 +11,18 @@
 <div class="periodes"><button data-j="1">24h</button><button data-j="7">7j</button><button data-j="30">30j</button><button data-j="365">1 an</button></div>
 <canvas id="canvas"></canvas></section>
 <section id="swap"><h2>⇄ Échanger avec Phantom</h2>
-<p class="info">Connectez <b>votre</b> Phantom et échangez via Jupiter (Solana).</p>
+<p class="info">Achetez ou vendez contre des USDC avec <b>votre</b> Phantom, au meilleur prix Jupiter (Solana).</p>
 <p class="frais" id="frais"></p>
-<div id="jupiter"></div></section>
+<div id="swapbox">
+<div class="sens"><button id="btnAchat">Acheter</button><button id="btnVente">Vendre</button></div>
+<label>Crypto</label><select id="jeton"></select>
+<label id="lblMontant"></label><input id="montant" type="text" inputmode="decimal" placeholder="ex : 10">
+<button id="devisBtn" class="gris">Voir le prix</button><div id="devis"></div>
+<button id="connect" class="gris">Connecter Phantom</button>
+<button id="echanger" class="vert">Échanger avec Phantom</button><div id="swapMsg"></div></div></section>
 <h2>★ Ma liste</h2><div id="liste" class="grille"></div>
 <h2>Top 20</h2><div id="top" class="grille"></div>
 <footer>Vos clés restent dans votre Phantom : le site ne voit jamais vos clés et chaque échange est signé par vous. Échanges via Jupiter. Données : CoinGecko / Binance.</footer>
-<script src="https://plugin.jup.ag/plugin-v1.js" data-preload defer></script>
-<script src="swap.js?v=3" defer></script>
-<script src="app.js?v=3"></script></body></html>
+<script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js" defer></script>
+<script src="swap.js?v=4" defer></script>
+<script src="app.js?v=4"></script></body></html>

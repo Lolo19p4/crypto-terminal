@@ -15,5 +15,8 @@ input{width:100%;font-size:24px;padding:12px;background:#111;color:#3f6;border:2
 .msg{font-size:24px;color:#ff0;padding:10px}#resultats .grille{margin-bottom:10px}
 #swap{margin-top:18px}.info{font-size:22px;color:#ddd;margin:6px 0}
 .frais{font-size:24px;color:#000;background:#ff0;padding:10px;border-radius:8px;font-weight:bold}
-#jupiter{min-height:560px;border:2px solid #3f6;border-radius:10px;overflow:hidden}
-:root{--jupiter-plugin-primary:51,255,102;--jupiter-plugin-background:0,0,0;--jupiter-plugin-primaryText:255,255,255;--jupiter-plugin-module:16,16,16;--jupiter-plugin-interactive:34,34,34}
+#swapbox{border:2px solid #3f6;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:8px}
+#swapbox label{font-size:22px;color:#ddd}#swapbox select,#swapbox input{font-size:26px;padding:10px;background:#111;color:#fff;border:2px solid #3f6;border-radius:8px;width:100%;margin:0}
+#swapbox button{font-size:26px;padding:14px;border-radius:10px;border:2px solid #3f6;font-family:monospace;font-weight:bold}
+.sens{display:flex;gap:8px}.sens button{flex:1;background:#111;color:#3f6}.sens button.on{background:#3f6;color:#000}
+.gris{background:#222;color:#fff}.vert{background:#3f6;color:#000}#devis{font-size:24px;color:#fff}#swapMsg{font-size:22px;color:#3f6}#swapMsg.err{color:#f55}#swapMsg a{color:#ff0}
