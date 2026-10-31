@@ -10,3 +10,6 @@ input{width:100%;font-size:24px;padding:12px;background:#111;color:#3f6;border:2
 #titreGraph{font-size:26px;color:#fff}canvas{width:100%;height:260px}
 .periodes button{font-size:22px;margin:6px 4px;padding:8px 14px;background:#111;color:#3f6;border:2px solid #3f6;border-radius:8px}
 .periodes button.on{background:#3f6;color:#000}footer{margin:20px 0;color:#888;font-size:18px}
+.cherche{display:flex;gap:8px;margin:10px 0}.cherche input{margin:0;flex:1;min-width:0}
+.cherche button{font-size:22px;padding:0 14px;background:#3f6;color:#000;border:0;border-radius:8px;font-weight:bold}
+.msg{font-size:24px;color:#ff0;padding:10px}#resultats .grille{margin-bottom:10px}

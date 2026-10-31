@@ -17,10 +17,11 @@ async function maj(){try{
  if(manq.length){(await get(`${CG}/coins/markets?vs_currency=eur&ids=${manq.join(",")}`)).forEach(c=>data[c.id]=c)}
  $("top").replaceChildren(...top.map(carte));
  etat("Mis à jour à "+new Date().toLocaleTimeString("fr-FR"));
-}catch(e){etat("⚠ "+e.message+" — prix Binance en direct",true)}
+}catch(e){etat("⚠ CoinGecko : "+e.message+" — prix Binance utilisés",true);await secours()}
  $("liste").replaceChildren(...liste.map(i=>data[i]||{id:i,name:i}).map(carte));}
 async function graph(){try{const d=await get(`${CG}/coins/${sel}/market_chart?vs_currency=eur&days=${jours}`);dessine(d.prices.map(p=>p[1]))}
-catch(e){etat("⚠ Graphique : "+e.message,true)}}
+catch(e){try{const s=SECOURS[sel];if(!s)throw e;const iv={1:"15m",7:"2h",30:"8h",365:"3d"}[jours];
+ const k=await get(`${BV}/klines?symbol=${s[0]}EUR&interval=${iv}&limit=120`);dessine(k.map(x=>+x[4]))}catch(_){etat("⚠ Graphique indisponible, nouvel essai bientôt",true)}}}
 function dessine(v){const cv=$("canvas"),r=devicePixelRatio||1,W=cv.clientWidth*r,H=cv.clientHeight*r;cv.width=W;cv.height=H;
 const x=cv.getContext("2d"),mn=Math.min(...v),mx=Math.max(...v),up=v[v.length-1]>=v[0];
 x.strokeStyle=up?"#3f6":"#f55";x.lineWidth=3*r;x.beginPath();
@@ -29,12 +30,31 @@ x.fillStyle="#fff";x.font=`${18*r}px monospace`;x.fillText("max "+eur(mx),5,22*r
 function choisir(id,nom){sel=id;$("titreGraph").textContent=nom||id;graph();scrollTo({top:$("graph").offsetTop-10,behavior:"smooth"})}
 document.querySelectorAll(".periodes button").forEach(b=>b.onclick=()=>{jours=+b.dataset.j;document.querySelectorAll(".periodes button").forEach(o=>o.classList.toggle("on",o===b));graph()});
 document.querySelector('[data-j="1"]').classList.add("on");
-let t;$("recherche").oninput=e=>{clearTimeout(t);const q=e.target.value.trim();if(!q){$("resultats").replaceChildren();return}
-t=setTimeout(async()=>{try{const r=await get(`${CG}/search?query=${encodeURIComponent(q)}`);const ids=r.coins.slice(0,6).map(c=>c.id);
-if(!ids.length){$("resultats").textContent="Rien trouvé";return}
-const m=await get(`${CG}/coins/markets?vs_currency=eur&ids=${ids.join(",")}`);m.forEach(c=>data[c.id]=c);$("resultats").replaceChildren(...m.map(carte))}catch(e){etat("⚠ "+e.message,true)}},600)};
+const norm=s=>(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase().trim();
+let t,num=0;
+function montre(list,msg){const r=$("resultats");if(msg){const d=document.createElement("div");d.className="msg";d.textContent=msg;r.replaceChildren(d,...list.map(carte))}else r.replaceChildren(...list.map(carte))}
+async function chercher(){const q=norm($("recherche").value),n=++num;if(!q){$("resultats").replaceChildren();return}
+ if(!Object.keys(data).length)await secours();
+ const loc=Object.values(data).filter(c=>norm(c.name).includes(q)||norm(c.symbol).includes(q)||norm(c.id).includes(q))
+  .sort((a,b)=>(norm(b.symbol)===q)-(norm(a.symbol)===q)||(a.market_cap_rank||9999)-(b.market_cap_rank||9999)).slice(0,8);
+ montre(loc,loc.length?"":"Recherche en cours…");
+ try{const r=await get(`${CG}/search?query=${encodeURIComponent(q)}`);if(n!==num)return;
+  const ids=r.coins.slice(0,8).map(c=>c.id).filter(id=>!loc.find(c=>c.id===id));
+  if(ids.length){(await get(`${CG}/coins/markets?vs_currency=eur&ids=${ids.join(",")}`)).forEach(c=>data[c.id]=c)}
+  if(n!==num)return;const all=[...loc,...ids.map(i=>data[i]).filter(Boolean)].slice(0,10);
+  montre(all,all.length?"":"Aucun résultat pour « "+$("recherche").value+" »");
+ }catch(e){if(n!==num)return;montre(loc,loc.length?"":(e.message.startsWith("Trop")?"Recherche en ligne saturée, réessaie dans 1 minute":"Aucun résultat"))}}
+$("recherche").oninput=()=>{clearTimeout(t);t=setTimeout(chercher,400)};
+$("form").onsubmit=e=>{e.preventDefault();clearTimeout(t);$("recherche").blur();chercher()};
+const BV="https://data-api.binance.vision/api/v3";
+const SECOURS={bitcoin:["BTC","Bitcoin"],ethereum:["ETH","Ethereum"],solana:["SOL","Solana"],litecoin:["LTC","Litecoin"],ripple:["XRP","XRP"],binancecoin:["BNB","BNB"],dogecoin:["DOGE","Dogecoin"],cardano:["ADA","Cardano"],tron:["TRX","TRON"],chainlink:["LINK","Chainlink"],"avalanche-2":["AVAX","Avalanche"]};
+async function secours(){try{const ids=Object.keys(SECOURS);
+ const r=await get(`${BV}/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(ids.map(k=>SECOURS[k][0]+"EUR")))}`);
+ r.forEach(t=>{const id=ids.find(k=>SECOURS[k][0]+"EUR"===t.symbol);data[id]=Object.assign(data[id]||{},{id,symbol:SECOURS[id][0],name:SECOURS[id][1],current_price:+t.lastPrice,price_change_percentage_24h:+t.priceChangePercent})});
+ if(!$("top").children.length)$("top").replaceChildren(...Object.values(data).filter(c=>c.current_price!=null).map(carte));
+}catch(e){etat("⚠ Prix indisponibles, nouvel essai dans 1 minute",true)}}
 // Binance temps réel
-try{const ws=new WebSocket("wss://stream.binance.com:9443/stream?streams="+Object.values(BIN).map(s=>s.toLowerCase()+"@miniTicker").join("/"));
+try{const ws=new WebSocket("wss://data-stream.binance.vision/stream?streams="+Object.values(BIN).map(s=>s.toLowerCase()+"@miniTicker").join("/"));
 ws.onmessage=m=>{const d=JSON.parse(m.data).data,id=Object.keys(BIN).find(k=>BIN[k]===d.s);if(!id||!data[id])return;
 data[id].current_price=+d.c;data[id].price_change_percentage_24h=(d.c-d.o)/d.o*100};
 setInterval(()=>{$("liste").replaceChildren(...liste.map(i=>data[i]||{id:i,name:i}).map(carte))},3000)}catch(e){}
