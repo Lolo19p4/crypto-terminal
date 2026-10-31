@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://lolo19p4.github.io/crypto-terminal/sitemap.xml
