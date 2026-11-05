@@ -1,41 +1,97 @@
 <!DOCTYPE html>
 <html lang="fr"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Terminal Crypto — Prix en direct & échange Phantom</title>
 <meta name="description" content="Terminal crypto gratuit en français : prix Bitcoin, Ethereum, Solana en direct, graphiques, liste de favoris et échange de tokens Solana avec Phantom via Jupiter.">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 <link rel="canonical" href="https://lolo19p4.github.io/crypto-terminal/">
-<meta property="og:type" content="website"><meta property="og:url" content="https://lolo19p4.github.io/crypto-terminal/">
+<meta property="og:type" content="website"><meta property="og:locale" content="fr_FR">
+<meta property="og:site_name" content="Terminal Crypto">
+<meta property="og:url" content="https://lolo19p4.github.io/crypto-terminal/">
 <meta property="og:title" content="Terminal Crypto — Prix en direct & échange Phantom">
 <meta property="og:description" content="Prix BTC, ETH, SOL en direct, graphiques et échange Solana avec Phantom. Gratuit, en français.">
-<meta property="og:image" content="https://lolo19p4.github.io/crypto-terminal/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Terminal Crypto — Prix en direct & échange Phantom">
-<meta name="twitter:description" content="Prix crypto en direct + échange Solana avec Phantom. Gratuit, en français."><meta name="twitter:image" content="https://lolo19p4.github.io/crypto-terminal/og.png">
-<link rel="stylesheet" href="style.css?v=4"></head>
+<meta property="og:image" content="https://lolo19p4.github.io/crypto-terminal/og.png">
+<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Terminal Crypto — aperçu">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Terminal Crypto — Prix en direct & échange Phantom">
+<meta name="twitter:description" content="Prix crypto en direct + échange Solana avec Phantom. Gratuit, en français.">
+<meta name="twitter:image" content="https://lolo19p4.github.io/crypto-terminal/og.png">
+<link rel="stylesheet" href="style.css?v=6">
+</head>
 <body>
-<header><h1>&gt; TERMINAL CRYPTO</h1><div id="etat">Chargement…</div></header>
-<form id="form" class="cherche"><input id="recherche" type="search" placeholder="Chercher (ex: sol)" autocomplete="off" enterkeyhint="search"><button type="submit">Rechercher</button></form>
-<div id="resultats"></div>
-<section id="graph"><div id="titreGraph">Bitcoin</div>
-<div class="periodes"><button data-j="1">24h</button><button data-j="7">7j</button><button data-j="30">30j</button><button data-j="365">1 an</button></div>
-<canvas id="canvas"></canvas></section>
-<section id="swap"><h2>⇄ Échanger avec Phantom</h2>
-<p class="info">Achetez ou vendez contre des USDC avec <b>votre</b> Phantom, au meilleur prix Jupiter (Solana).</p>
-<p class="frais" id="frais"></p>
-<div id="swapbox">
-<div class="sens"><button id="btnAchat">Acheter</button><button id="btnVente">Vendre</button></div>
-<label>Crypto</label><select id="jeton"></select>
-<label id="lblMontant"></label><input id="montant" type="text" inputmode="decimal" placeholder="ex : 10">
-<button id="devisBtn" class="gris">Voir le prix</button><div id="devis"></div>
-<button id="connect" class="gris">Connecter Phantom</button>
-<button id="echanger" class="vert">Échanger avec Phantom</button><div id="swapMsg"></div></div></section>
-<section id="memes"><h2>🔥 Memecoins Solana : tendances & nouveaux</h2>
-<p class="alerte">⚠️ <b>Très risqué :</b> ces tokens peuvent perdre 90 % ou plus en quelques minutes, voire être des arnaques. N'investissez que de petites sommes, vérifiez la liquidité et l'âge. Seuls les tokens avec plus de 20 000 $ de liquidité sont affichés.</p>
-<div class="sens"><button id="mTend" class="on">Tendances</button><button id="mNew">Nouveaux</button></div>
-<div id="memeListe">Chargement…</div></section>
-<h2>★ Ma liste</h2><div id="liste" class="grille"></div>
-<h2>Top 20</h2><div id="top" class="grille"></div>
-<footer>Vos clés restent dans votre Phantom : le site ne voit jamais vos clés et chaque échange est signé par vous. Échanges via Jupiter. Données : CoinGecko / Binance.</footer>
+<a class="skip" href="#contenu">Aller au contenu</a>
+<header>
+  <h1>&gt; TERMINAL CRYPTO</h1>
+  <div id="etat" role="status" aria-live="polite">Chargement…</div>
+</header>
+<main id="contenu">
+<form id="form" class="cherche" role="search">
+  <label class="sr" for="recherche">Chercher une crypto</label>
+  <input id="recherche" type="search" placeholder="Chercher (ex: sol)" autocomplete="off" enterkeyhint="search" aria-controls="resultats">
+  <button type="submit">Rechercher</button>
+</form>
+<div id="resultats" aria-live="polite"></div>
+<section id="graph" aria-labelledby="titreGraph">
+  <h2 id="titreGraph">Bitcoin</h2>
+  <div class="periodes" role="group" aria-label="Période du graphique">
+    <button type="button" data-j="1">24h</button>
+    <button type="button" data-j="7">7j</button>
+    <button type="button" data-j="30">30j</button>
+    <button type="button" data-j="365">1 an</button>
+  </div>
+  <canvas id="canvas" role="img" aria-label="Graphique des prix"></canvas>
+</section>
+<section id="swap" aria-labelledby="titreSwap">
+  <h2 id="titreSwap">⇄ Échanger avec Phantom</h2>
+  <p class="info">Achetez ou vendez contre des USDC avec <b>votre</b> Phantom, au meilleur prix Jupiter (Solana).</p>
+  <p class="frais" id="frais" role="note"></p>
+  <div id="swapbox">
+    <div class="sens" role="group" aria-label="Sens de l'échange">
+      <button type="button" id="btnAchat">Acheter</button>
+      <button type="button" id="btnVente">Vendre</button>
+    </div>
+    <label for="jeton">Crypto</label>
+    <select id="jeton"></select>
+    <label id="lblMontant" for="montant"></label>
+    <input id="montant" type="text" inputmode="decimal" placeholder="ex : 10" autocomplete="off">
+    <button type="button" id="devisBtn" class="gris">Voir le prix</button>
+    <div id="devis" aria-live="polite"></div>
+    <button type="button" id="connect" class="gris">Connecter Phantom</button>
+    <button type="button" id="echanger" class="vert">Échanger avec Phantom</button>
+    <div id="swapMsg" role="status" aria-live="polite"></div>
+  </div>
+</section>
+<section id="memes" aria-labelledby="titreMemes">
+  <h2 id="titreMemes">🔥 Memecoins Solana : tendances &amp; nouveaux</h2>
+  <p class="alerte">⚠️ <b>Très risqué :</b> ces tokens peuvent perdre 90 % ou plus en quelques minutes, voire être des arnaques. N'investissez que de petites sommes, vérifiez la liquidité et l'âge. Seuls les tokens avec plus de 20 000 $ de liquidité sont affichés.</p>
+  <div class="sens" role="group" aria-label="Type de memecoins">
+    <button type="button" id="mTend" class="on">Tendances</button>
+    <button type="button" id="mNew">Nouveaux</button>
+  </div>
+  <div id="memeListe">Chargement…</div>
+</section>
+<section aria-labelledby="titreListe">
+  <h2 id="titreListe">★ Ma liste</h2>
+  <div id="liste" class="grille"></div>
+</section>
+<section aria-labelledby="titreTop">
+  <h2 id="titreTop">Top 20</h2>
+  <div id="top" class="grille"></div>
+</section>
+</main>
+<footer>
+  <p>Vos clés restent dans votre Phantom : le site ne voit jamais vos clés et chaque échange est signé par vous. Échanges via Jupiter. Données : CoinGecko / Binance.</p>
+  <p class="lien-prix"><a href="prix/">Cours des cryptos en euro</a></p>
+</footer>
 <script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js" defer></script>
-<script src="swap.js?v=5" defer></script>
-<script src="app.js?v=4"></script><script src="memes.js?v=1" defer></script><footer style="text-align:center;padding:12px"><a href="prix/">Cours des cryptos en euro</a></footer></body></html>
+<script src="swap.js?v=6" defer></script>
+<script src="app.js?v=6" defer></script>
+<script src="memes.js?v=6" defer></script>
+</body></html>
