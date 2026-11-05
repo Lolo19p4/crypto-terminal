@@ -1,7 +1,7 @@
 // ===== Échange Jupiter (Swap API v2 /build) avec frais du site =====
 // Les frais vont sur le compte USDC de Loïc (propriétaire BSxnWLQadUHMW3uS1uiG7EbEdLbdfdX72Wq4RJ7bd13q).
 const FEE_ACCOUNT = "FdmsMDUwUQ5fcouLXKrwuc8gLuMLYVm5qxtuYHa7bmeg";
-const FEE_BPS = 255; // 2,55 %
+const FEE_BPS = 300; // 3 %
 const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const JETONS = [
   ["SOL","So11111111111111111111111111111111111111112",9],
