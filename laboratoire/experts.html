@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="color-scheme" content="dark">
+<title>Sol Desk Lab — 16 cryptos, 6 experts (simulation)</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#e8efff;background:#080c19}
+*{box-sizing:border-box}
+body{margin:0;padding:20px;max-width:1500px;margin-inline:auto}
+a{color:#83cfff} .top{display:flex;gap:24px;flex-wrap:wrap;justify-content:space-between;align-items:center}
+h1{margin:3px 0;font-size:clamp(25px,5vw,40px)}h2{font-size:20px;margin:0 0 10px}
+small,.muted{color:#9caec8}.eyebrow{color:#83e2ac;letter-spacing:.12em;font-weight:700;font-size:12px}
+.panel{background:#111a2d;border:1px solid #293857;border-radius:15px;padding:18px;margin-top:16px}
+.warning{border-left:4px solid #e8b45f;background:#302816;padding:10px 14px;border-radius:7px;color:#ffe5b8}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:10px;margin-top:15px}
+.stat{border:1px solid #283853;background:#131f36;border-radius:12px;padding:15px}
+.stat b{font-size:clamp(19px,3vw,28px);display:block;margin-top:3px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between}
+input,button{background:#172943;color:#f2f7ff;border:1px solid #426087;border-radius:9px;padding:10px;font:inherit}
+button{cursor:pointer;font-weight:650}button:hover{background:#23416d}button:disabled{opacity:.45;cursor:not-allowed}
+input{min-width:180px;flex:1;max-width:400px}
+#refresh{background:#155a49;border-color:#2fa181}
+.scroll{overflow:auto;max-height:67vh}
+table{width:100%;min-width:900px;border-collapse:collapse;text-align:left}
+th{background:#15223c;position:sticky;top:0;color:#a9bedc;font-size:12px;text-transform:uppercase}
+th,td{padding:12px 10px;border-bottom:1px solid #24334d;white-space:nowrap}
+tbody tr{cursor:pointer}tbody tr:hover,tbody tr.sel{background:#1b3150}
+td b{color:#fff}.gain{color:#75e8a1}.loss{color:#ff9b9b}.unknown{color:#94a3ba}
+.tag{border:1px solid #556578;padding:3px 7px;border-radius:20px;font-size:11px}
+.tag.ok{color:#76e6a2;border-color:#2c7658}
+.tag.non{color:#ff9999;border-color:#88404b}
+.tag.attente{color:#e7c38b;border-color:#846434}
+.tag.attention{color:#d1d8e5;border-color:#6b7794}
+.details{display:grid;grid-template-columns:repeat(3,minmax(200px,1fr));gap:10px}
+.expert{border:1px solid #2a3957;padding:12px;border-radius:12px;background:#101a2e}
+.expert h3{font-size:15px;margin:0 0 8px}.expert p{font-size:13px;line-height:1.45;color:#b6c9df;margin:8px 0 0}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+code{color:#83cfff}
+#log{font-size:13px;line-height:1.7;max-height:220px;overflow:auto}
+#log div{border-bottom:1px solid #263652;padding:6px 0}
+#status{font-size:13px}
+@media(max-width:780px){body{padding:12px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}.details{grid-template-columns:1fr}th,td{padding:9px}h1{font-size:26px}}
+</style>
+</head>
+<body>
+<header class="top">
+ <div><div class="eyebrow">MP-4 · LABORATOIRE CRYPTO</div><h1>16 cryptos · 6 experts</h1><div class="muted">Veille multi-chaînes, décisions expliquées, simulation avec frais</div></div>
+ <div><span class="tag non">AUCUN ORDRE RÉEL</span><p><small>Prix : CoinGecko · flux BTC/ETH/SOL : Binance EUR si disponible</small></p></div>
+</header>
+<div class="warning" role="note">Version d'essai : aucune clé privée, connexion wallet, signature ni transaction. Les « experts » sont des contrôles programmés, pas six IA autonomes. Les performances de simulation ne prédisent pas les gains.</div>
+<section class="stats" aria-label="Résumé">
+ <div class="stat"><small>Cryptos surveillées</small><b id="count">0 / 16</b></div>
+ <div class="stat"><small>Valeur fictive estimée</small><b id="equity">1 000 €</b></div>
+ <div class="stat"><small>Cash fictif</small><b id="cash">1 000 €</b></div>
+ <div class="stat"><small>Positions fictives</small><b id="positions">0 / 3</b></div>
+</section>
+<section class="panel">
+ <div class="toolbar">
+  <div><h2>Marchés et verdicts</h2><span id="status" role="status">Chargement…</span></div>
+  <div class="row"><input id="search" type="search" placeholder="Filtrer BTC, SOL, Base…" aria-label="Filtrer les cryptos"><button id="refresh">Actualiser</button></div>
+ </div>
+ <p class="muted"><small>Les prix CoinGecko sont interrogés toutes les 60 s, pas toutes les 5 s. Les quelques cours Binance compatibles arrivent par WebSocket ; les anciennes données sont marquées périmées. Les volumes ne prouvent pas la liquidité d'un pool.</small></p>
+ <div class="scroll"><table aria-label="16 cryptomonnaies">
+  <thead><tr><th>Crypto / Réseau</th><th>Prix EUR</th><th>1 h</th><th>24 h</th><th>Volume 24 h</th><th>Source</th><th>Experts</th><th>Simulation</th></tr></thead>
+  <tbody id="assets"></tbody>
+ </table></div>
+</section>
+<section class="panel">
+ <h2 id="selectedTitle">Analyse des six experts</h2>
+ <div id="selectedText" class="muted">Choisis une ligne pour lire les six analyses.</div>
+ <div id="details" class="details" style="margin-top:12px"></div>
+</section>
+<section class="panel">
+ <div class="toolbar"><h2>Portefeuille fictif · simulation uniquement</h2><button id="reset">Réinitialiser les 1 000 € fictifs</button></div>
+ <p class="muted">Maximum 15 % du capital par achat, réserve 10 %, 3 positions, stop fictif −4 % si la page reçoit un prix frais, perte réalisée quotidienne max 8 %, pause après 2 pertes. Frais illustratifs : <b>3 % à l'achat + 3 % à la vente</b> (niveau configuré dans le site existant), glissement 0,2 % par opération, hors frais réseau. <b>Ce ne sont pas des ordres stop placés sur une blockchain.</b></p>
+ <div id="paper" class="muted">Aucune position fictive.</div>
+ <h2 style="margin-top:16px">Journal des simulations</h2>
+ <div id="log"></div>
+</section>
+<footer class="muted" style="padding:20px 4px">Projet suivi dans <a href="https://loicm7059.atlassian.net/browse/MP-4">Jira MP-4</a>. Code de démonstration séparé du site publié et du robot Phantom. Prix et décisions informatifs seulement.</footer>
+<script src="./experts-engine.js"></script>
+<script src="./experts-ui.js"></script>
+</body></html>
