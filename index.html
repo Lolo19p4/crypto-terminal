@@ -1,101 +1,72 @@
-<!DOCTYPE html>
-<html lang="fr"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Terminal Crypto — Prix en direct & échange Phantom</title>
-<meta name="description" content="Terminal crypto gratuit en français : prix Bitcoin, Ethereum, Solana en direct, graphiques, liste de favoris et échange de tokens Solana avec Phantom via Jupiter.">
-<meta name="theme-color" content="#000000">
-<meta name="color-scheme" content="dark">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="icon" type="image/png" href="favicon.png">
-<link rel="apple-touch-icon" href="favicon.png">
+<!doctype html>
+<html lang="fr"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080c12"><meta name="color-scheme" content="dark">
+<title>Terminal Crypto Pro — Marchés, trading, tokens & NFT multichaînes</title>
+<meta name="description" content="Terminal crypto public avec cours de marché, graphiques, échange Phantom par Jupiter, explorateur Ethereum, Base, Polygon et autres blockchains, tokens et NFT.">
+<meta property="og:type" content="website"><meta property="og:locale" content="fr_FR"><meta property="og:site_name" content="Terminal Crypto Pro">
+<meta property="og:title" content="Terminal Crypto Pro — Marchés & explorateur multichaînes"><meta property="og:description" content="Marchés, chandeliers, transactions, tokens et NFT sur plusieurs réseaux.">
+<meta property="og:image" content="https://lolo19p4.github.io/crypto-terminal/og.png"><meta name="twitter:card" content="summary_large_image">
 <link rel="canonical" href="https://lolo19p4.github.io/crypto-terminal/">
-<meta property="og:type" content="website"><meta property="og:locale" content="fr_FR">
-<meta property="og:site_name" content="Terminal Crypto">
-<meta property="og:url" content="https://lolo19p4.github.io/crypto-terminal/">
-<meta property="og:title" content="Terminal Crypto — Prix en direct & échange Phantom">
-<meta property="og:description" content="Prix BTC, ETH, SOL en direct, graphiques et échange Solana avec Phantom. Gratuit, en français.">
-<meta property="og:image" content="https://lolo19p4.github.io/crypto-terminal/og.png">
-<meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Terminal Crypto — aperçu">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Terminal Crypto — Prix en direct & échange Phantom">
-<meta name="twitter:description" content="Prix crypto en direct + échange Solana avec Phantom. Gratuit, en français.">
-<meta name="twitter:image" content="https://lolo19p4.github.io/crypto-terminal/og.png">
-<meta name="twitter:url" content="https://lolo19p4.github.io/crypto-terminal/">
-<script type="application/ld+json">
-{"@context":"https://schema.org","@type":"WebApplication","name":"Terminal Crypto","url":"https://lolo19p4.github.io/crypto-terminal/","description":"Terminal crypto gratuit en français : prix Bitcoin, Ethereum, Solana en direct, graphiques, liste de favoris et échange de tokens Solana avec Phantom via Jupiter.","applicationCategory":"FinanceApplication","operatingSystem":"Web","inLanguage":"fr-FR","image":"https://lolo19p4.github.io/crypto-terminal/og.png","offers":{"@type":"Offer","price":"0","priceCurrency":"EUR"}}
-</script>
-<link rel="stylesheet" href="style.css?v=7">
-</head>
-<body>
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="stylesheet" href="terminal-pro.css?v=1">
+</head><body>
 <a class="skip" href="#contenu">Aller au contenu</a>
-<header>
-  <h1>&gt; TERMINAL CRYPTO</h1>
-  <div id="etat" role="status" aria-live="polite">Chargement…</div>
-</header>
-<main id="contenu">
-<form id="form" class="cherche" role="search">
-  <label class="sr" for="recherche">Chercher une crypto</label>
-  <input id="recherche" type="search" placeholder="Chercher (ex: sol)" autocomplete="off" enterkeyhint="search" aria-controls="resultats">
-  <button type="submit">Rechercher</button>
-</form>
-<div id="resultats" aria-live="polite"></div>
-<section id="graph" aria-labelledby="titreGraph">
-  <h2 id="titreGraph">Bitcoin</h2>
-  <div class="periodes" role="group" aria-label="Période du graphique">
-    <button type="button" data-j="1">24h</button>
-    <button type="button" data-j="7">7j</button>
-    <button type="button" data-j="30">30j</button>
-    <button type="button" data-j="365">1 an</button>
-  </div>
-  <canvas id="canvas" role="img" aria-label="Graphique des prix"></canvas>
+<div class="masthead"><div class="mastinner">
+<a href="#contenu" class="brand"><span class="brandmark">◈</span><span><strong>TERMINAL CRYPTO <span style="color:#72d9ff">PRO</span></strong><small>Marchés • Blockchains • Web3</small></span></a>
+<nav class="headnav" aria-label="Navigation"><a href="#chartblock">Trading</a><a href="#marches">Marchés</a><a href="#explorateur">Explorateur</a><a href="#memes">Tokens</a><a href="#swap">Échanger</a><a href="https://lolo19p4.github.io/sol-desk/explorateur.html" target="_blank" rel="noopener">Base / EVM ↗</a></nav>
+<div class="headstatus"><span class="live-dot"></span><span id="etat" role="status">Connexion aux sources…</span></div>
+</div></div>
+<main class="shell" id="contenu">
+<div class="intro"><div><div class="eyebrow">POSTE DE TRADING MULTICHAÎNES</div><h1>Le marché en grand. Les données réelles.</h1><p>Cours et graphiques depuis les plateformes de marché, actifs on-chain depuis les explorateurs.</p></div>
+<div class="caps"><span class="chip"><em>●</em> BTC / ETH / SOL</span><span class="chip">Tokens ERC-20</span><span class="chip">NFT ERC-721 / 1155</span><span class="chip">13 réseaux</span></div></div>
+<div class="workspace">
+<aside class="panel" id="watchlist"><div class="phead"><h2>★ Liste de surveillance</h2><small>Prix EUR</small></div><div class="pbody">
+<form id="form" class="cherche" role="search"><label class="sr" for="recherche">Chercher une crypto</label><input type="search" id="recherche" placeholder="Chercher un actif…" autocomplete="off" aria-controls="resultats"><button type="submit">⌕</button></form>
+<div id="resultats" class="search-results" aria-live="polite"></div><div class="watchhint">Mes favoris — cliquer pour afficher le graphique</div><div id="liste" class="grille"></div>
+<div class="mini-note">Cours issus de CoinGecko et, selon disponibilité, de Binance. Les taux peuvent varier.</div>
+</div></aside>
+<section class="panel" id="chartblock" aria-label="Graphique du marché">
+<div class="chart-top"><div><div class="pair-kicker">ANALYSE DU MARCHÉ</div><h2 class="pair-name"><span id="titreGraph">Bitcoin</span><span class="chart-tag">Marché</span></h2></div><span class="chip">Prix en euros</span></div>
+<section id="graph">
+<div class="chart-controls"><div class="chart-switch" role="group" aria-label="Type de graphique"><button type="button" class="on" data-view="candles">Chandeliers</button><button type="button" data-view="line">Courbe</button></div>
+<div class="periodes" role="group" aria-label="Période"><button type="button" data-j="1" class="on">24 h</button><button type="button" data-j="7">7 j</button><button type="button" data-j="30">30 j</button><button type="button" data-j="365">1 an</button></div></div>
+<div class="chart-frame"><canvas id="candles" role="img" aria-label="Chandeliers réels de marché"></canvas><canvas id="canvas" role="img" aria-label="Graphique de prix historique"></canvas></div>
+<div class="chart-source"><span id="candleSource">Récupération des chandeliers…</span><span>Une source indisponible n'est jamais remplacée par un faux prix.</span></div>
 </section>
-<section id="swap" aria-labelledby="titreSwap">
-  <h2 id="titreSwap">⇄ Échanger avec Phantom</h2>
-  <p class="info">Achetez ou vendez contre des USDC avec <b>votre</b> Phantom, au meilleur prix Jupiter (Solana).</p>
-  <p class="frais" id="frais" role="note"></p>
-  <div id="swapbox">
-    <div class="sens" role="group" aria-label="Sens de l'échange">
-      <button type="button" id="btnAchat">Acheter</button>
-      <button type="button" id="btnVente">Vendre</button>
-    </div>
-    <label for="jeton">Crypto</label>
-    <select id="jeton"></select>
-    <label id="lblMontant" for="montant"></label>
-    <input id="montant" type="text" inputmode="decimal" placeholder="ex : 10" autocomplete="off">
-    <button type="button" id="devisBtn" class="gris">Voir le prix</button>
-    <div id="devis" aria-live="polite"></div>
-    <button type="button" id="connect" class="gris">Connecter Phantom</button>
-    <button type="button" id="echanger" class="vert">Échanger avec Phantom</button>
-    <div id="swapMsg" role="status" aria-live="polite"></div>
-  </div>
 </section>
-<section id="memes" aria-labelledby="titreMemes">
-  <h2 id="titreMemes">🔥 Memecoins Solana : tendances &amp; nouveaux</h2>
-  <p class="alerte">⚠️ <b>Très risqué :</b> ces tokens peuvent perdre 90 % ou plus en quelques minutes, voire être des arnaques. N'investissez que de petites sommes, vérifiez la liquidité et l'âge. Seuls les tokens avec plus de 20 000 $ de liquidité sont affichés.</p>
-  <div class="sens" role="group" aria-label="Type de memecoins">
-    <button type="button" id="mTend" class="on">Tendances</button>
-    <button type="button" id="mNew">Nouveaux</button>
-  </div>
-  <div id="memeListe">Chargement…</div>
+<section class="panel" id="swap" aria-labelledby="titreSwap"><div class="phead"><h2 id="titreSwap">⇄ Échange crypto</h2><small>Jupiter • Solana</small></div><div class="pbody">
+<p class="info small">Échange de tokens sur le réseau Solana. Connexion Phantom et validation dans ton portefeuille pour chaque ordre.</p>
+<p id="frais" class="frais"></p>
+<div id="swapbox"><div class="sens" role="group" aria-label="Sens de l'échange"><button id="btnAchat" type="button">Acheter</button><button id="btnVente" type="button">Vendre</button></div>
+<label for="jeton">Token Solana</label><select id="jeton" aria-label="Token à échanger"></select>
+<label for="montant" id="lblMontant">Montant</label><input type="text" id="montant" inputmode="decimal" autocomplete="off" placeholder="Ex. 10">
+<button type="button" class="gris" id="devisBtn">Obtenir un devis</button><div id="devis" aria-live="polite"></div>
+<button type="button" class="gris" id="connect">Connecter Phantom</button><button type="button" class="vert" id="echanger">Valider l'échange dans Phantom</button><div id="swapMsg" role="status" aria-live="polite"></div>
+</div><p class="mini-note">Transactions réelles uniquement après confirmation de la signature dans Phantom. Les frais affichés s'appliquent selon le devis.</p>
+</div></section>
+</div>
+<div class="below">
+<section class="panel" id="marches"><div class="phead"><h2>Marchés — Top 20</h2><small>Les cours sont actualisés lorsque la source répond</small></div><div id="top" class="markets-tiles"></div></section>
+<section class="panel" id="memes"><div class="phead"><h2>Tokens en tendance</h2><small>Solana • GeckoTerminal</small></div><div class="pbody"><p class="alerte">Les nouveaux tokens sont volatils et risqués. Les données peuvent être incomplètes. La présence ici n'est pas une recommandation d'achat.</p>
+<div class="sens" role="group" aria-label="Type de tokens"><button id="mTend" type="button" class="on">Tendances</button><button id="mNew" type="button">Nouveaux</button></div><div id="memeListe" class="small">Chargement des pools…</div></div></section>
+</div>
+<section class="panel explorer" id="explorateur" aria-labelledby="expTitle">
+<div class="phead"><div><h2 id="expTitle">◈ Explorateur blockchains · tokens · NFT</h2><small>Adresse ou hash recherché à la demande — rien n'est publié automatiquement</small></div><span class="chip">Lecture publique de la blockchain</span></div>
+<div class="explorerform"><select id="chainNetwork" aria-label="Blockchain">
+<option value="base">Base</option><option value="ethereum">Ethereum</option><option value="polygon">Polygon</option><option value="arbitrum">Arbitrum</option><option value="optimism">Optimism</option><option value="bnb">BNB Chain</option><option value="avalanche">Avalanche</option><option value="zora">Zora</option><option value="solana">Solana</option><option value="bitcoin">Bitcoin</option><option value="litecoin">Litecoin</option><option value="polkadot">Polkadot</option><option value="aleo">Aleo</option>
+</select><input type="text" id="chainInput" spellcheck="false" autocomplete="off" placeholder="Adresse publique ou hash de transaction"><button id="scan" type="button">Explorer</button></div>
+<div id="chainStatus" class="exstatus" role="status">Choisis un réseau et colle une adresse publique ou une transaction. Les réseaux sans API intégrée ouvrent leur explorateur.</div>
+<div id="chainOverview" class="exsummary"></div><div class="ex-tabs" role="tablist" aria-label="Résultats blockchain"><button type="button" class="tab-btn active" data-tab="tx">Transactions</button><button type="button" class="tab-btn" data-tab="tokens">Tokens</button><button type="button" class="tab-btn" data-tab="nft">NFT</button></div><div id="chainContent" class="excontent"></div>
+<div class="netlinks"><a href="https://basescan.org" target="_blank" rel="noopener">BaseScan ↗</a><a href="https://etherscan.io" target="_blank" rel="noopener">Etherscan ↗</a><a href="https://solscan.io" target="_blank" rel="noopener">Solscan ↗</a><a href="https://mempool.space" target="_blank" rel="noopener">Bitcoin ↗</a><a href="https://chains.blockscout.com" target="_blank" rel="noopener">Autres réseaux ↗</a></div>
 </section>
-<section aria-labelledby="titreListe">
-  <h2 id="titreListe">★ Ma liste</h2>
-  <div id="liste" class="grille"></div>
-</section>
-<section aria-labelledby="titreTop">
-  <h2 id="titreTop">Top 20</h2>
-  <div id="top" class="grille"></div>
-</section>
+<footer><p>Terminal crypto public • données : CoinGecko, Binance, GeckoTerminal et explorateurs Blockscout. Disponibilité et fraîcheur variables selon les fournisseurs.</p>
+<p>Les adresses de wallet, tokens et NFT saisis restent dans la recherche du navigateur ; le site ne requiert ni phrase de récupération ni clé privée. Les données blockchain sont publiques. <a href="https://github.com/Lolo19p4/crypto-terminal">Code source GitHub</a>.</p>
+<p>Trading = risque de perte. Pas de bénéfice garanti. L'interface ne passe aucun ordre sans l'action et la signature du propriétaire du portefeuille.</p></footer>
 </main>
-<footer>
-  <p>Vos clés restent dans votre Phantom : le site ne voit jamais vos clés et chaque échange est signé par vous. Échanges via Jupiter. Données : CoinGecko / Binance.</p>
-  <p class="lien-prix"><a href="prix/">Cours des cryptos en euro</a></p>
-</footer>
 <script src="https://unpkg.com/@solana/web3.js@1.98.4/lib/index.iife.min.js" defer></script>
 <script src="swap.js?v=7" defer></script>
 <script src="app.js?v=7" defer></script>
 <script src="memes.js?v=7" defer></script>
+<script src="terminal-pro.js?v=1" defer></script>
 </body></html>
