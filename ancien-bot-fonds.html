@@ -18,7 +18,7 @@ table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;p
 .scroll{overflow-x:auto}.meta{font-size:12px;color:var(--muted)}.bad{color:var(--bad)}.good{color:var(--good)}.full{grid-column:1/-1}
 footer{color:var(--muted);padding:22px 0;font-size:12px}code{overflow-wrap:anywhere}ul{padding-left:20px}
 </style></head><body><main>
-<header><div><div class="sub">GROK BOT · SOL DESK · TERMINAL CRYPTO PRO</div><h1>Crypto, bot et fonds — données réelles</h1><div class="sub">Contrôles publics, actualisation à la demande, sources et horodatages.</div></div><a class="btn" href="./">Retour au terminal</a></header>
+<header><div><div class="sub">GROK BOT · SOL DESK · TERMINAL CRYPTO PRO</div><h1>Crypto, bot et fonds — données réelles</h1><div class="sub">Contrôles publics, actualisation du bot toutes les 60 s et des soldes renseignés toutes les 2 minutes (lorsque la page est ouverte).</div></div><a class="btn" href="./">Retour au terminal</a></header>
 <div class="grid">
 <section class="card full"><h2>État du bot Sol Desk</h2>
 <div id="bot-status" class="status">Lecture du dernier journal publié…</div>
@@ -126,6 +126,19 @@ setText("evm-balance",left.toString()+(right?","+right:"")+" "+conf[1]);setText(
 }catch(e){status("evm-status","Lecture indisponible : "+e.message+". Vérification possible depuis le lien explorateur.",true)}
 }
 $("bot-refresh").addEventListener("click",bot);$("load-legacy").addEventListener("click",legacy);$("wallet-refresh").addEventListener("click",wallet);$("evm-refresh").addEventListener("click",evm);
-bot();setInterval(()=>{if(!document.hidden)bot()},60000);
+let refreshingBalances=false;
+async function refreshEnteredAddresses(){
+ if(document.hidden||refreshingBalances)return;
+ refreshingBalances=true;
+ try{
+  if(isSolana($("wallet").value.trim()))await wallet();
+  if(/^0x[a-fA-F0-9]{40}$/.test($("evm-address").value.trim()))await evm();
+ }finally{refreshingBalances=false}
+}
+bot();
+setInterval(()=>{if(!document.hidden)bot()},60000);
+setInterval(refreshEnteredAddresses,120000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden){bot();refreshEnteredAddresses()}});
+
 })();
 </script></body></html>
