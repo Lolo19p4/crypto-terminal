@@ -49,8 +49,8 @@ footer{color:var(--muted);padding:22px 0;font-size:12px}code{overflow-wrap:anywh
 </section>
 <section class="card"><h2>Portefeuilles EVM</h2>
 <label for="evm-address">Adresse publique EVM</label><input id="evm-address" type="text" spellcheck="false" autocomplete="off" placeholder="0x + 40 caractères" />
-<label for="network">Réseau</label><select id="network"><option value="base">Base</option><option value="ethereum">Ethereum</option><option value="polygon">Polygon</option><option value="arbitrum">Arbitrum</option><option value="optimism">Optimism</option></select>
-<div class="toolbar"><button id="evm-refresh">Lire le réseau</button></div>
+<label for="network">Réseau</label><select id="network"><option value="base">Base</option><option value="ethereum">Ethereum</option><option value="polygon">Polygon</option><option value="arbitrum">Arbitrum</option><option value="optimism">Optimism</option><option value="bnb">BNB Chain</option><option value="avalanche">Avalanche C-Chain</option><option value="zora">Zora</option><option value="gnosis">Gnosis</option><option value="celo">Celo</option><option value="linea">Linea</option><option value="scroll">Scroll</option></select>
+<div class="toolbar"><button type="button" id="phantom-evm">Connecter Phantom EVM</button><button id="evm-refresh">Lire le réseau</button><button type="button" id="all-evm">Contrôler 5 réseaux EVM</button></div><div class="scroll"><table><thead><tr><th>Réseau</th><th>Résultat vérifié</th><th>Explorateur</th></tr></thead><tbody id="all-evm-rows"><tr><td colspan="3">Aucune lecture effectuée</td></tr></tbody></table></div>
 <div id="evm-status" class="status">Sélectionne un réseau et saisis une adresse.</div>
 <div class="statgrid"><div class="stat"><span>Solde natif vérifié</span><strong id="evm-balance">—</strong></div><div class="stat"><span>Transactions connues</span><strong id="evm-txs">—</strong></div></div>
 <div id="evm-explorer"></div>
@@ -67,6 +67,12 @@ footer{color:var(--muted);padding:22px 0;font-size:12px}code{overflow-wrap:anywh
 <section class="card full"><h2>Tokens SPL présents sur Solana</h2><p class="meta">Quantités brutes ajustées aux décimales renvoyées par le nœud, sans prix inventés. Les tokens sans valeur de marché vérifiée restent des quantités, pas des euros.</p>
 <div class="scroll"><table><thead><tr><th>Mint</th><th>Quantité détenue</th><th>Compte</th></tr></thead><tbody id="spl"><tr><td colspan="3">Interroger une adresse pour afficher les tokens.</td></tr></tbody></table></div>
 </section>
+<section class="card full"><h2>Autres blockchains — accès aux explorateurs</h2>
+<p class="meta">Une adresse publique peut être différente pour chaque réseau. Pour ces réseaux, ouvre l’explorateur : aucun montant n’est estimé sans réponse d’une source blockchain.</p>
+<div class="grid"><div><label for="other-network">Blockchain</label><select id="other-network">
+<option value="bitcoin">Bitcoin</option><option value="litecoin">Litecoin</option><option value="solana">Solana</option><option value="tron">TRON</option><option value="polkadot">Polkadot</option><option value="cardano">Cardano</option><option value="sui">Sui</option><option value="aptos">Aptos</option><option value="cosmos">Cosmos</option><option value="near">NEAR</option><option value="xrp">XRP Ledger</option><option value="stellar">Stellar</option><option value="bch">Bitcoin Cash</option><option value="aleo">Aleo</option>
+</select></div><div><label for="other-addr">Adresse publique sur ce réseau</label><input id="other-addr" type="text" spellcheck="false" autocomplete="off" placeholder="Ne jamais saisir une phrase secrète" /></div></div>
+<div class="toolbar"><button id="other-open" type="button">Ouvrir l’explorateur</button><a class="btn" href="https://chains.blockscout.com/" target="_blank" rel="noopener">Autres réseaux EVM</a></div><div class="status" id="other-status">Aucune adresse sélectionnée.</div><p id="other-link"></p></section>
 <section class="card full"><h2>Historique des opérations de Sol Desk</h2><p class="meta">Historique publié, avec liens vers les transactions Solscan. Une entrée de journal ne prouve pas, seule, la réussite d'une opération.</p>
 <div class="scroll"><table><thead><tr><th>Date</th><th>Actif</th><th>Opération</th><th>P&L annoncé</th><th>Preuve à consulter</th></tr></thead><tbody id="trades"><tr><td colspan="5">Lecture en cours…</td></tr></tbody></table></div></section>
 </div>
@@ -77,7 +83,8 @@ footer{color:var(--muted);padding:22px 0;font-size:12px}code{overflow-wrap:anywh
 "use strict";
 const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString("fr-FR",{maximumFractionDigits:9}), formatDate=s=>{const d=new Date(s||"");return Number.isNaN(+d)?"Inconnue":d.toLocaleString("fr-FR",{timeZone:"Europe/Paris",dateStyle:"short",timeStyle:"short"})};
 const endpoints=["https://solana-rpc.publicnode.com","https://api.mainnet-beta.solana.com"];
-const explorers={base:["https://base.blockscout.com","ETH"],ethereum:["https://eth.blockscout.com","ETH"],polygon:["https://polygon.blockscout.com","POL"],arbitrum:["https://arbitrum.blockscout.com","ETH"],optimism:["https://optimism.blockscout.com","ETH"]};
+const explorers={base:["https://base.blockscout.com","ETH",true],ethereum:["https://eth.blockscout.com","ETH",true],polygon:["https://polygon.blockscout.com","POL",true],arbitrum:["https://arbitrum.blockscout.com","ETH",true],optimism:["https://optimism.blockscout.com","ETH",true],bnb:["https://bscscan.com","BNB",false],avalanche:["https://snowtrace.io","AVAX",false],zora:["https://explorer.zora.energy","ETH",false],gnosis:["https://gnosis.blockscout.com","xDAI",false],celo:["https://celoscan.io","CELO",false],linea:["https://lineascan.build","ETH",false],scroll:["https://scrollscan.com","ETH",false]};
+const otherChains={bitcoin:"https://mempool.space/address/",litecoin:"https://litecoinspace.org/address/",solana:"https://solscan.io/account/",tron:"https://tronscan.org/#/address/",polkadot:"https://polkadot.subscan.io/account/",cardano:"https://cardanoscan.io/address/",sui:"https://suiscan.xyz/mainnet/account/",aptos:"https://explorer.aptoslabs.com/account/",cosmos:"https://www.mintscan.io/cosmos/address/",near:"https://nearblocks.io/address/",xrp:"https://xrpscan.com/account/",stellar:"https://stellar.expert/explorer/public/account/",bch:"https://blockchair.com/bitcoin-cash/address/",aleo:"https://aleoscan.io/address/"};
 function setText(id,s){$(id).textContent=String(s)}
 function status(id,msg,error=false){const el=$(id);el.textContent=msg;el.className="status"+(error?" warning":"")}
 async function jsonGet(url){const c=new AbortController(),t=setTimeout(()=>c.abort(),14000);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);return await r.json()}finally{clearTimeout(t)}}
@@ -183,7 +190,7 @@ try{
 async function evm(){
 const addr=$("evm-address").value.trim(),network=$("network").value,conf=explorers[network];$("evm-explorer").replaceChildren();setText("evm-balance","—");setText("evm-txs","—");
 if(!/^0x[a-fA-F0-9]{40}$/.test(addr)){status("evm-status","Adresse EVM invalide.",true);return}
-status("evm-status","Interrogation du réseau "+network+"…");const url=conf[0]+"/address/"+addr;link($("evm-explorer"),"Explorer l'adresse et les contrats",url);
+status("evm-status","Interrogation du réseau "+network+"…");const url=conf[0]+"/address/"+addr;link($("evm-explorer"),"Explorer l'adresse et les contrats",url);if(!conf[2]){status("evm-status","Explorateur "+network+" disponible. Lecture API directe non intégrée : aucun montant indiqué.");return;}
 try{const obj=await jsonGet(conf[0]+"/api/v2/addresses/"+addr);const balance=obj.coin_balance;if(balance==null)throw Error("Solde natif absent");const base=BigInt(balance);
 const left=base/1000000000000000000n,right=(base%1000000000000000000n).toString().padStart(18,"0").slice(0,9).replace(/0+$/,"");
 setText("evm-balance",left.toString()+(right?","+right:"")+" "+conf[1]);setText("evm-txs",obj.transactions_count??"—");status("evm-status","Réponse publique "+network+" à "+new Date().toLocaleString("fr-FR")+". Les tokens et positions DeFi peuvent être distincts du solde natif.");
@@ -208,7 +215,49 @@ async function connectPhantomReadonly(){
  }catch(e){status("wallet-status","Connexion Phantom non validée : "+(e.message||"erreur inconnue"),true)}
 }
 $("connect-phantom").addEventListener("click",connectPhantomReadonly);
-$("perps-refresh").addEventListener("click",perps);$("loans-refresh").addEventListener("click",loans);$("bot-refresh").addEventListener("click",bot);$("load-legacy").addEventListener("click",legacy);$("wallet-refresh").addEventListener("click",async()=>{await wallet();await perps();await loans()});$("evm-refresh").addEventListener("click",evm);
+$("perps-refresh").addEventListener("click",perps);$("loans-refresh").addEventListener("click",loans);async function connectPhantomEvm(){
+ const p=(window.phantom&&window.phantom.ethereum)||(window.ethereum&&window.ethereum.isPhantom?window.ethereum:null);
+ if(!p||!p.request){
+  status("evm-status","Phantom EVM non détecté. Ouvre le site dans Phantom ou utilise une adresse EVM publique.",true);
+  return;
+ }
+ try{
+  status("evm-status","Autorise uniquement la lecture de l'adresse dans Phantom.");
+  const addresses=await p.request({method:"eth_requestAccounts"});
+  const a=Array.isArray(addresses)&&addresses.find(x=>/^0x[a-fA-F0-9]{40}$/.test(x));
+  if(!a)throw Error("Aucune adresse EVM fournie");
+  $("evm-address").value=a;await evm();
+ }catch(e){status("evm-status","Connexion Phantom EVM non confirmée : "+(e.message||e),true);}
+}
+async function scanFiveEvm(){
+ const address=$("evm-address").value.trim(),table=$("all-evm-rows");
+ if(!/^0x[a-fA-F0-9]{40}$/.test(address)){status("evm-status","Saisis une adresse EVM publique valide.",true);return;}
+ table.replaceChildren();
+ const nets=["base","ethereum","polygon","arbitrum","optimism"];
+ for(const n of nets){
+  const row=document.createElement("tr");cell(row,n);cell(row,"Chargement…");
+  const td=document.createElement("td");link(td,"Explorer",explorers[n][0]+"/address/"+address);row.appendChild(td);table.appendChild(row);
+  jsonGet(explorers[n][0]+"/api/v2/addresses/"+address).then(o=>{
+   if(o.coin_balance==null)throw Error("Solde absent");
+   const b=BigInt(o.coin_balance);const whole=b/1000000000000000000n;
+   const fractional=(b%1000000000000000000n).toString().padStart(18,"0").slice(0,8).replace(/0+$/,"");
+   row.children[1].textContent=whole+(fractional?","+fractional:"")+" "+explorers[n][1];
+  }).catch(()=>{row.children[1].textContent="Source indisponible";});
+ }
+}
+function otherNetwork(){
+ const kind=$("other-network").value,addr=$("other-addr").value.trim(),base=otherChains[kind],el=$("other-link");
+ el.replaceChildren();
+ if(!addr||addr.length>130||/[\s<>]/.test(addr)){status("other-status","Adresse publique manquante ou invalide.",true);return;}
+ if(/^(?:[a-zA-Z]+\s+){11,23}[a-zA-Z]+$/.test(addr)){status("other-status","Phrase de récupération interdite. Utilise uniquement une adresse publique.",true);return;}
+ if(!base){status("other-status","Explorateur indisponible.",true);return;}
+ link(el,"Explorer l'adresse sur "+kind,base+encodeURIComponent(addr));
+ status("other-status","Lien de recherche créé. Aucun solde inventé, aucune transaction.");
+}
+$("phantom-evm").addEventListener("click",connectPhantomEvm);
+$("all-evm").addEventListener("click",scanFiveEvm);
+$("other-open").addEventListener("click",otherNetwork);
+$("bot-refresh").addEventListener("click",bot);$("load-legacy").addEventListener("click",legacy);$("wallet-refresh").addEventListener("click",async()=>{await wallet();await perps();await loans()});$("evm-refresh").addEventListener("click",evm);
 let refreshingBalances=false;
 async function refreshEnteredAddresses(){
  if(document.hidden||refreshingBalances)return;
