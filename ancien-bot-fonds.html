@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark"><title>Terminal réel — Crypto, Bot et fonds</title>
+<style>
+:root{--bg:#070b16;--panel:#111c2c;--edge:#263c52;--blue:#70d5f9;--muted:#a3b8c9;--good:#69d3a2;--bad:#ff9494}
+*{box-sizing:border-box}body{background:var(--bg);color:#edf6ff;font:14px/1.5 system-ui,sans-serif;margin:0}main{max-width:1200px;margin:auto;padding:20px}
+a{color:var(--blue)}header{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;padding:18px 0;border-bottom:1px solid var(--edge)}
+h1{font-size:clamp(23px,4vw,38px);margin:0}h2{font-size:19px;margin:0 0 10px}
+.sub{color:var(--muted)}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(320px,100%),1fr));gap:14px;margin-top:18px}
+.card{background:var(--panel);border:1px solid var(--edge);border-radius:13px;padding:18px;min-width:0}
+.statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:12px;margin:14px 0}.stat{padding:12px;border-radius:10px;background:#0b1422}
+.stat span{display:block;color:var(--muted);font-size:12px}.stat strong{display:block;font-size:23px;overflow-wrap:anywhere}
+label{display:block;color:var(--muted);margin-bottom:5px}input,select{background:#090f1b;border:1px solid #3b5b71;color:#fff;border-radius:8px;padding:11px;font:inherit;min-width:0;width:100%}
+button,.btn{background:#173248;border:1px solid #38708a;color:#e4f9ff;border-radius:8px;padding:11px 13px;font:600 13px system-ui,sans-serif;cursor:pointer;text-decoration:none;display:inline-block}
+button:hover,.btn:hover{background:#23516b}.toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}.toolbar button{flex:0 1 auto}
+.status{padding:9px 11px;background:#092137;border-left:3px solid var(--blue);border-radius:5px;margin:10px 0}.warning{border-left-color:var(--bad);background:#311d26}
+table{width:100%;border-collapse:collapse;font-size:12px}th,td{text-align:left;padding:9px;border-bottom:1px solid var(--edge);vertical-align:top}
+.scroll{overflow-x:auto}.meta{font-size:12px;color:var(--muted)}.bad{color:var(--bad)}.good{color:var(--good)}.full{grid-column:1/-1}
+footer{color:var(--muted);padding:22px 0;font-size:12px}code{overflow-wrap:anywhere}ul{padding-left:20px}
+</style></head><body><main>
+<header><div><div class="sub">GROK BOT · SOL DESK · TERMINAL CRYPTO PRO</div><h1>Crypto, bot et fonds — données réelles</h1><div class="sub">Contrôles publics, actualisation à la demande, sources et horodatages.</div></div><a class="btn" href="./">Retour au terminal</a></header>
+<div class="grid">
+<section class="card full"><h2>État du bot Sol Desk</h2>
+<div id="bot-status" class="status">Lecture du dernier journal publié…</div>
+<div class="statgrid">
+<div class="stat"><span>Dernier passage déclaré</span><strong id="last-check">—</strong></div>
+<div class="stat"><span>Positions déclarées</span><strong id="positions">—</strong></div>
+<div class="stat"><span>Opérations consignées</span><strong id="count">—</strong></div>
+<div class="stat"><span>Résultat déclaré ($)</span><strong id="pnl">—</strong></div>
+<div class="stat"><span>Gagnants / perdants consignés</span><strong id="wins">—</strong></div>
+</div><p class="meta" id="mode"></p><p class="meta">Source : <a target="_blank" rel="noopener" href="https://github.com/Lolo19p4/sol-desk/blob/master/status.json">status.json</a> et <a target="_blank" rel="noopener" href="https://github.com/Lolo19p4/sol-desk/blob/master/trades.json">trades.json</a>. Les écritures du bot ne sont pas des soldes bancaires ou de portefeuille.</p>
+<div class="toolbar"><button id="bot-refresh">Actualiser le journal</button><a class="btn" href="https://lolo19p4.github.io/sol-desk/" target="_blank" rel="noopener">Ancien terminal</a></div>
+</section>
+<section class="card"><h2>Fonds Solana — lecture blockchain</h2>
+<label for="wallet">Adresse publique Solana</label><input id="wallet" type="text" spellcheck="false" autocomplete="off" placeholder="Adresse Solana (base58)" />
+<div class="toolbar"><button id="load-legacy">Charger l'adresse de Sol Desk</button><button id="wallet-refresh">Lire les soldes</button></div>
+<div id="wallet-status" class="status">Aucune valeur présentée sans réponse d'un nœud Solana.</div>
+<div class="statgrid"><div class="stat"><span>Solde SOL natif on-chain</span><strong id="sol">—</strong></div><div class="stat"><span>Comptes SPL recensés</span><strong id="spl-count">—</strong></div></div>
+<p class="meta" id="rpc-info">Solde en unités de blockchain. Des tokens peuvent être non valorisables ou frauduleux ; les NFT ne sont pas assimilés à des fonds disponibles.</p>
+<p id="solscan-link" class="meta"></p>
+</section>
+<section class="card"><h2>Portefeuilles EVM</h2>
+<label for="evm-address">Adresse publique EVM</label><input id="evm-address" type="text" spellcheck="false" autocomplete="off" placeholder="0x + 40 caractères" />
+<label for="network">Réseau</label><select id="network"><option value="base">Base</option><option value="ethereum">Ethereum</option><option value="polygon">Polygon</option><option value="arbitrum">Arbitrum</option><option value="optimism">Optimism</option></select>
+<div class="toolbar"><button id="evm-refresh">Lire le réseau</button></div>
+<div id="evm-status" class="status">Sélectionne un réseau et saisis une adresse.</div>
+<div class="statgrid"><div class="stat"><span>Solde natif vérifié</span><strong id="evm-balance">—</strong></div><div class="stat"><span>Transactions connues</span><strong id="evm-txs">—</strong></div></div>
+<div id="evm-explorer"></div>
+<p class="meta">Source : API publique Blockscout, lorsque disponible. Les autres actifs ERC-20 et NFT sont à consulter dans l'explorateur multichaîne du <a href="./#explorateur">terminal principal</a>.</p>
+</section>
+<section class="card full"><h2>Tokens SPL présents sur Solana</h2><p class="meta">Quantités brutes ajustées aux décimales renvoyées par le nœud, sans prix inventés. Les tokens sans valeur de marché vérifiée restent des quantités, pas des euros.</p>
+<div class="scroll"><table><thead><tr><th>Mint</th><th>Quantité détenue</th><th>Compte</th></tr></thead><tbody id="spl"><tr><td colspan="3">Interroger une adresse pour afficher les tokens.</td></tr></tbody></table></div>
+</section>
+<section class="card full"><h2>Historique des opérations de Sol Desk</h2><p class="meta">Historique publié, avec liens vers les transactions Solscan. Une entrée de journal ne prouve pas, seule, la réussite d'une opération.</p>
+<div class="scroll"><table><thead><tr><th>Date</th><th>Actif</th><th>Opération</th><th>P&L annoncé</th><th>Preuve à consulter</th></tr></thead><tbody id="trades"><tr><td colspan="5">Lecture en cours…</td></tr></tbody></table></div></section>
+</div>
+<footer>Lecture seule. Aucun ordre, transfert ou signature n'est envoyé depuis cette page. Connexion Coinbase Agent indisponible tant que son autorisation renvoie 403. Affichage des sources, sans garantie de présence de liquidité ni de récupérabilité des actifs.</footer>
+</main>
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id), fmt=n=>Number(n).toLocaleString("fr-FR",{maximumFractionDigits:9}), formatDate=s=>{const d=new Date(s||"");return Number.isNaN(+d)?"Inconnue":d.toLocaleString("fr-FR",{timeZone:"Europe/Paris",dateStyle:"short",timeStyle:"short"})};
+const endpoints=["https://solana-rpc.publicnode.com","https://api.mainnet-beta.solana.com"];
+const explorers={base:["https://base.blockscout.com","ETH"],ethereum:["https://eth.blockscout.com","ETH"],polygon:["https://polygon.blockscout.com","POL"],arbitrum:["https://arbitrum.blockscout.com","ETH"],optimism:["https://optimism.blockscout.com","ETH"]};
+function setText(id,s){$(id).textContent=String(s)}
+function status(id,msg,error=false){const el=$(id);el.textContent=msg;el.className="status"+(error?" warning":"")}
+async function jsonGet(url){const c=new AbortController(),t=setTimeout(()=>c.abort(),14000);try{const r=await fetch(url,{signal:c.signal,cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);return await r.json()}finally{clearTimeout(t)}}
+function link(parent,text,url){const a=document.createElement("a");a.textContent=text;a.href=url;a.target="_blank";a.rel="noopener noreferrer";parent.appendChild(a)}
+function cell(tr,s){const td=document.createElement("td");td.textContent=String(s);tr.appendChild(td);return td}
+function rowText(table,text,col){table.replaceChildren();const row=document.createElement("tr");const td=cell(row,text);td.colSpan=col;table.appendChild(row)}
+async function bot(){
+status("bot-status","Récupération des données publiques Sol Desk…");
+try{
+const [st,tr]=await Promise.all([jsonGet("https://raw.githubusercontent.com/Lolo19p4/sol-desk/master/status.json"),jsonGet("https://raw.githubusercontent.com/Lolo19p4/sol-desk/master/trades.json")]);
+const r=tr.resume||{},last=st.dernier_passage||st.maj;setText("last-check",formatDate(last));setText("positions",st.nb_positions==null?"—":st.nb_positions);
+setText("count",r.nb_trades==null?"—":r.nb_trades);setText("pnl",r.pnl_total_usd==null?"—":fmt(r.pnl_total_usd)+" $");
+$("pnl").className=Number(r.pnl_total_usd)<0?"bad":"good";setText("wins",(r.gagnants??"—")+" / "+(r.perdants??"—"));setText("mode",st.mode||tr.mode&&tr.mode.nom||"");
+const age=Date.now()-Date.parse(last);if(!Number.isFinite(age))status("bot-status","Horodatage absent : état du bot inconnu.",true);else if(age<0)status("bot-status","Horodatage dans le futur : impossible de confirmer l'activité.",true);else if(age>20*60000)status("bot-status","Dernière publication il y a "+Math.floor(age/60000)+" min : fonctionnement actuel non confirmé.",true);else status("bot-status","Dernier signal publié il y a "+Math.floor(age/60000)+" min. Le journal ne confirme pas que le processus tourne encore.");
+const history=Array.isArray(tr.trades)?tr.trades.slice():[];history.sort((a,b)=>Date.parse(b.date||"")-Date.parse(a.date||""));
+const tb=$("trades");tb.replaceChildren();
+if(!history.length)rowText(tb,"Aucune entrée disponible",5);
+history.slice(0,50).forEach(x=>{const r=document.createElement("tr");cell(r,formatDate(x.date));cell(r,x.actif||"—");cell(r,x.sens||"—");cell(r,x.pnl_usd==null?"—":fmt(x.pnl_usd)+" $");
+const td=document.createElement("td");if(/^https:\/\/solscan\.io\/tx\/[A-Za-z0-9]+$/.test(x.solscan||""))link(td,"Voir Solscan",x.solscan);else td.textContent="Non fourni";r.appendChild(td);tb.appendChild(r)});
+}catch(err){status("bot-status","Impossible de lire le journal : "+err.message,true);rowText($("trades"),"Journal non disponible",5)}
+}
+async function rpc(method,params){
+let failure;
+for(const url of endpoints){
+const c=new AbortController(),timer=setTimeout(()=>c.abort(),13000);
+try{const r=await fetch(url,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method,params}),signal:c.signal,cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const data=await r.json();if(data.error)throw Error(data.error.message||"Erreur RPC");return {data:data.result,endpoint:url}}
+catch(e){failure=e}finally{clearTimeout(timer)}
+}throw failure||Error("Pas de réponse RPC");
+}
+function isSolana(v){return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(v)}
+async function wallet(){
+const addr=$("wallet").value.trim();setText("sol","—");setText("spl-count","—");rowText($("spl"),"Lecture du réseau en cours…",3);$("solscan-link").replaceChildren();
+if(!isSolana(addr)){status("wallet-status","Adresse Solana invalide.",true);return}
+status("wallet-status","Interrogation des nœuds Solana…");
+try{
+const sol=await rpc("getBalance",[addr,{commitment:"confirmed"}]);setText("sol",fmt(Number(sol.data.value)/1e9)+" SOL");
+const config={encoding:"jsonParsed",commitment:"confirmed"};
+const prog=["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA","TokenzQdBNbLqP5VEhdkAS6EtFNwCb2EB4yF4bFUH5vcg"];
+let tokens=[],partial=false;
+for(const p of prog){try{const ret=await rpc("getTokenAccountsByOwner",[addr,{programId:p},config]);tokens.push(...(ret.data.value||[]))}catch(_){partial=true}}
+const table=$("spl");table.replaceChildren();let nonZero=0;
+for(const t of tokens){const info=t.account&&t.account.data&&t.account.data.parsed&&t.account.data.parsed.info;if(!info)continue;const n=info.tokenAmount&&info.tokenAmount.uiAmountString;if(!n||Number(n)<=0)continue;nonZero++;
+const tr=document.createElement("tr");const td=document.createElement("td");link(td,info.mint||"Mint inconnu","https://solscan.io/token/"+encodeURIComponent(info.mint||""));tr.appendChild(td);cell(tr,n);cell(tr,t.pubkey||"—");table.appendChild(tr);}
+if(!nonZero)rowText(table,partial?"Tokens partiellement indisponibles.":"Aucun compte avec quantité positive dans la réponse.",3);
+setText("spl-count",nonZero);
+status("wallet-status","SOL consulté sur "+sol.endpoint+" à "+new Date().toLocaleString("fr-FR")+"."+ (partial?" Comptes SPL incomplets.":""));
+link($("solscan-link"),"Vérifier l'adresse et les transactions sur Solscan","https://solscan.io/account/"+addr);
+}catch(err){status("wallet-status","Soldes indisponibles : "+err.message+". Aucune valeur estimée.",true);rowText($("spl"),"Aucune donnée fiable reçue",3)}
+}
+async function legacy(){
+status("wallet-status","Recherche de l'adresse publique configurée dans l'ancien Sol Desk…");
+try{const r=await fetch("https://raw.githubusercontent.com/Lolo19p4/sol-desk/master/terminal.js",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const txt=await r.text();const match=txt.match(/\bWALLET\s*=\s*['"]([1-9A-HJ-NP-Za-km-z]{32,44})['"]/);if(!match)throw Error("Adresse absente du code historique");$("wallet").value=match[1];await wallet();}
+catch(e){status("wallet-status","Adresse historique indisponible : "+e.message,true)}
+}
+async function evm(){
+const addr=$("evm-address").value.trim(),network=$("network").value,conf=explorers[network];$("evm-explorer").replaceChildren();setText("evm-balance","—");setText("evm-txs","—");
+if(!/^0x[a-fA-F0-9]{40}$/.test(addr)){status("evm-status","Adresse EVM invalide.",true);return}
+status("evm-status","Interrogation du réseau "+network+"…");const url=conf[0]+"/address/"+addr;link($("evm-explorer"),"Explorer l'adresse et les contrats",url);
+try{const obj=await jsonGet(conf[0]+"/api/v2/addresses/"+addr);const balance=obj.coin_balance;if(balance==null)throw Error("Solde natif absent");const base=BigInt(balance);
+const left=base/1000000000000000000n,right=(base%1000000000000000000n).toString().padStart(18,"0").slice(0,9).replace(/0+$/,"");
+setText("evm-balance",left.toString()+(right?","+right:"")+" "+conf[1]);setText("evm-txs",obj.transactions_count??"—");status("evm-status","Réponse publique "+network+" à "+new Date().toLocaleString("fr-FR")+". Les tokens et positions DeFi peuvent être distincts du solde natif.");
+}catch(e){status("evm-status","Lecture indisponible : "+e.message+". Vérification possible depuis le lien explorateur.",true)}
+}
+$("bot-refresh").addEventListener("click",bot);$("load-legacy").addEventListener("click",legacy);$("wallet-refresh").addEventListener("click",wallet);$("evm-refresh").addEventListener("click",evm);
+bot();setInterval(()=>{if(!document.hidden)bot()},60000);
+})();
+</script></body></html>
