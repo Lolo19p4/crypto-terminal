@@ -56,6 +56,14 @@ footer{color:var(--muted);padding:22px 0;font-size:12px}code{overflow-wrap:anywh
 <div id="evm-explorer"></div>
 <p class="meta">Source : API publique Blockscout, lorsque disponible. Les autres actifs ERC-20 et NFT sont à consulter dans l'explorateur multichaîne du <a href="./#explorateur">terminal principal</a>.</p>
 </section>
+<section class="card"><h2>Jupiter Perps — prêts associés</h2>
+<p class="meta">Comptes de prêt propres au module Jupiter Perpetuals. Ce n'est pas un inventaire complet de Jupiter Lend ou de tous les dépôts DeFi.</p>
+<div class="toolbar"><button type="button" id="loans-refresh">Vérifier les prêts Jupiter</button></div>
+<div id="loans-status" class="status">Aucune réponse Jupiter consultée.</div>
+<div class="statgrid"><div class="stat"><span>Prêts signalés par l’API</span><strong id="loans-count">—</strong></div></div>
+<div class="scroll"><table><thead><tr><th>Garantie USD</th><th>Emprunt USD</th><th>Compte</th></tr></thead><tbody id="loans-table"><tr><td colspan="3">Non vérifié.</td></tr></tbody></table></div>
+<p class="meta">Source : <a href="https://perps-api.jup.ag/v1/docs" target="_blank" rel="noopener">Jupiter Perpetuals GET /loans/positions</a>. Ce résultat n'est pas un montant retirable.</p>
+</section>
 <section class="card full"><h2>Tokens SPL présents sur Solana</h2><p class="meta">Quantités brutes ajustées aux décimales renvoyées par le nœud, sans prix inventés. Les tokens sans valeur de marché vérifiée restent des quantités, pas des euros.</p>
 <div class="scroll"><table><thead><tr><th>Mint</th><th>Quantité détenue</th><th>Compte</th></tr></thead><tbody id="spl"><tr><td colspan="3">Interroger une adresse pour afficher les tokens.</td></tr></tbody></table></div>
 </section>
@@ -121,7 +129,7 @@ link($("solscan-link"),"Vérifier l'adresse et les transactions sur Solscan","ht
 }
 async function legacy(){
 status("wallet-status","Recherche de l'adresse publique configurée dans l'ancien Sol Desk…");
-try{const r=await fetch("https://raw.githubusercontent.com/Lolo19p4/sol-desk/master/terminal.js",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const txt=await r.text();const match=txt.match(/\bWALLET\s*=\s*['"]([1-9A-HJ-NP-Za-km-z]{32,44})['"]/);if(!match)throw Error("Adresse absente du code historique");$("wallet").value=match[1];await wallet();await perps();}
+try{const r=await fetch("https://raw.githubusercontent.com/Lolo19p4/sol-desk/master/terminal.js",{cache:"no-store"});if(!r.ok)throw Error("HTTP "+r.status);const txt=await r.text();const match=txt.match(/\bWALLET\s*=\s*['"]([1-9A-HJ-NP-Za-km-z]{32,44})['"]/);if(!match)throw Error("Adresse absente du code historique");$("wallet").value=match[1];await wallet();await perps();await loans();}
 catch(e){status("wallet-status","Adresse historique indisponible : "+e.message,true)}
 }
 async function perps(){
@@ -150,6 +158,28 @@ for(const p of positions){
 status("perps-status","Réponse Jupiter Perps à "+new Date().toLocaleString("fr-FR")+" pour cette adresse. Les produits Jupiter hors Perps ne sont pas inclus.");
 }catch(e){status("perps-status","Positions Jupiter non vérifiables : "+e.message+". Un refus d'API n'indique pas un solde nul.",true);rowText($("perps-table"),"Aucune réponse fiable ; aucune position ne peut être exclue.",5);}
 }
+async function loans(){
+const addr=$("wallet").value.trim();setText("loans-count","—");rowText($("loans-table"),"Recherche des prêts Jupiter…",3);
+if(!isSolana(addr)){status("loans-status","Adresse publique Solana requise.",true);rowText($("loans-table"),"Aucune adresse.",3);return;}
+status("loans-status","Lecture de Jupiter Perpetuals Loans…");
+try{
+ const resp=await jsonGet("https://perps-api.jup.ag/v1/loans/positions?walletAddress="+encodeURIComponent(addr));
+ if(!resp||!Array.isArray(resp.dataList))throw Error("Format de réponse non reconnu");
+ setText("loans-count",resp.dataList.length);
+ const body=$("loans-table");body.replaceChildren();
+ if(!resp.dataList.length)rowText(body,"Aucun prêt associé dans la réponse Perps Loans.",3);
+ for(const p of resp.dataList){
+  const tr=document.createElement("tr");
+  const a=Number(p.collateralUsd),b=Number(p.borrowSizeUsd);
+  cell(tr,p.collateralUsd==null?"—":Number.isFinite(a)?fmt(a/1000000)+" $":"—");
+  cell(tr,p.borrowSizeUsd==null?"—":Number.isFinite(b)?fmt(b/1000000)+" $":"—");
+  const td=document.createElement("td");
+  if(isSolana(p.positionPubkey||""))link(td,"Position Solscan","https://solscan.io/account/"+p.positionPubkey);else td.textContent="Non indiqué";
+  tr.appendChild(td);body.appendChild(tr);
+ }
+ status("loans-status","Jupiter Perps Loans : réponse consultée à "+new Date().toLocaleString("fr-FR")+". Ceci n'inclut pas les autres produits Jupiter Lend.");
+}catch(e){status("loans-status","Prêts non vérifiables : "+e.message,true);rowText($("loans-table"),"Réponse indisponible : ne pas déduire zéro.",3);}
+}
 async function evm(){
 const addr=$("evm-address").value.trim(),network=$("network").value,conf=explorers[network];$("evm-explorer").replaceChildren();setText("evm-balance","—");setText("evm-txs","—");
 if(!/^0x[a-fA-F0-9]{40}$/.test(addr)){status("evm-status","Adresse EVM invalide.",true);return}
@@ -159,7 +189,7 @@ const left=base/1000000000000000000n,right=(base%1000000000000000000n).toString(
 setText("evm-balance",left.toString()+(right?","+right:"")+" "+conf[1]);setText("evm-txs",obj.transactions_count??"—");status("evm-status","Réponse publique "+network+" à "+new Date().toLocaleString("fr-FR")+". Les tokens et positions DeFi peuvent être distincts du solde natif.");
 }catch(e){status("evm-status","Lecture indisponible : "+e.message+". Vérification possible depuis le lien explorateur.",true)}
 }
-$("perps-refresh").addEventListener("click",perps);$("bot-refresh").addEventListener("click",bot);$("load-legacy").addEventListener("click",legacy);$("wallet-refresh").addEventListener("click",async()=>{await wallet();await perps()});$("evm-refresh").addEventListener("click",evm);
+$("perps-refresh").addEventListener("click",perps);$("loans-refresh").addEventListener("click",loans);$("bot-refresh").addEventListener("click",bot);$("load-legacy").addEventListener("click",legacy);$("wallet-refresh").addEventListener("click",async()=>{await wallet();await perps();await loans()});$("evm-refresh").addEventListener("click",evm);
 let refreshingBalances=false;
 async function refreshEnteredAddresses(){
  if(document.hidden||refreshingBalances)return;
@@ -170,6 +200,12 @@ async function refreshEnteredAddresses(){
  }finally{refreshingBalances=false}
 }
 bot();
+const supplied=new URLSearchParams(window.location.search).get("wallet");
+if(supplied&&isSolana(supplied)){
+ $("wallet").value=supplied;
+ status("wallet-status","Recherche automatique de l'adresse publique fournie dans le lien…");
+ Promise.allSettled([wallet(),perps(),loans()]);
+}
 setInterval(()=>{if(!document.hidden)bot()},60000);
 setInterval(refreshEnteredAddresses,120000);
 document.addEventListener("visibilitychange",()=>{if(!document.hidden){bot();refreshEnteredAddresses()}});
