@@ -33,7 +33,7 @@ footer{color:var(--muted);padding:22px 0;font-size:12px}code{overflow-wrap:anywh
 </section>
 <section class="card"><h2>Fonds Solana — lecture blockchain</h2>
 <label for="wallet">Adresse publique Solana</label><input id="wallet" type="text" spellcheck="false" autocomplete="off" placeholder="Adresse Solana (base58)" />
-<div class="toolbar"><button id="load-legacy">Charger l'adresse de Sol Desk</button><button id="wallet-refresh">Lire les soldes</button></div>
+<div class="toolbar"><button type="button" id="connect-phantom">Connecter Phantom · consulter</button><button id="load-legacy">Charger l'adresse de Sol Desk</button><button id="wallet-refresh">Lire les soldes</button></div><p class="meta">La connexion Phantom fournit uniquement l’adresse publique sélectionnée. Aucune opération financière, signature de transaction ou transfert ne se fait depuis cette page.</p>
 <div id="wallet-status" class="status">Aucune valeur présentée sans réponse d'un nœud Solana.</div>
 <div class="statgrid"><div class="stat"><span>Solde SOL natif on-chain</span><strong id="sol">—</strong></div><div class="stat"><span>Comptes SPL recensés</span><strong id="spl-count">—</strong></div></div>
 <p class="meta" id="rpc-info">Solde en unités de blockchain. Des tokens peuvent être non valorisables ou frauduleux ; les NFT ne sont pas assimilés à des fonds disponibles.</p>
@@ -189,6 +189,25 @@ const left=base/1000000000000000000n,right=(base%1000000000000000000n).toString(
 setText("evm-balance",left.toString()+(right?","+right:"")+" "+conf[1]);setText("evm-txs",obj.transactions_count??"—");status("evm-status","Réponse publique "+network+" à "+new Date().toLocaleString("fr-FR")+". Les tokens et positions DeFi peuvent être distincts du solde natif.");
 }catch(e){status("evm-status","Lecture indisponible : "+e.message+". Vérification possible depuis le lien explorateur.",true)}
 }
+async function connectPhantomReadonly(){
+ const p=window.phantom?.solana?.isPhantom?window.phantom.solana:(window.solana?.isPhantom?window.solana:null);
+ if(!p){
+  status("wallet-status","Phantom n'est pas détecté dans ce navigateur. Sur téléphone, ouvre cette page dans le navigateur intégré à Phantom pour choisir ton portefeuille.",true);
+  const url="https://phantom.app/ul/browse/"+encodeURIComponent(window.location.href)+"?ref="+encodeURIComponent(window.location.origin);
+  const area=$("solscan-link");area.replaceChildren();link(area,"Ouvrir cette page dans Phantom",url);return;
+ }
+ try{
+  status("wallet-status","Demande de connexion à Phantom : confirme uniquement le partage de ton adresse publique, sans signer de transaction.");
+  const out=await p.connect();const address=out?.publicKey?.toString();
+  if(!isSolana(address||""))throw new Error("Phantom n'a pas renvoyé une adresse Solana valide");
+  $("wallet").value=address;
+  const u=new URL(window.location.href);u.searchParams.delete("wallet");
+  window.history.replaceState(null,"",u.pathname+u.search+u.hash);
+  status("wallet-status","Phantom connecté (lecture publique) : "+address.slice(0,5)+"…"+address.slice(-5)+". Consultation des soldes et positions en cours.");
+  await Promise.allSettled([wallet(),perps(),loans()]);
+ }catch(e){status("wallet-status","Connexion Phantom non validée : "+(e.message||"erreur inconnue"),true)}
+}
+$("connect-phantom").addEventListener("click",connectPhantomReadonly);
 $("perps-refresh").addEventListener("click",perps);$("loans-refresh").addEventListener("click",loans);$("bot-refresh").addEventListener("click",bot);$("load-legacy").addEventListener("click",legacy);$("wallet-refresh").addEventListener("click",async()=>{await wallet();await perps();await loans()});$("evm-refresh").addEventListener("click",evm);
 let refreshingBalances=false;
 async function refreshEnteredAddresses(){
